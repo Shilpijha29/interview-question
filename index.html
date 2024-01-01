@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee List</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #dddddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .yellow-background {
+      background-color: yellow;
+    }
+
+    .light-red-background {
+      background-color: lightcoral;
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      z-index: 1000;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+
+    .editable {
+      border: 1px solid #ddd;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<table id="employeeTable">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Area</th>
+      <th>Contact No</th>
+      <th>Experience Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Placeholder for table rows -->
+  </tbody>
+</table>
+
+<div class="popup" id="popup">
+  <h2 id="popupTitle">Employee Details</h2>
+  <div id="popupContent"></div>
+  <button id="editButton" onclick="editEmployee()">Edit</button>
+  <button id="deleteButton" onclick="deleteEmployee()">Delete</button>
+  <button id="saveButton" onclick="saveEmployee()" style="display: none;">Save</button>
+  <button id="cancelButton" onclick="cancelEdit()" style="display: none;">Cancel</button>
+  <button onclick="closePopup()">Close</button>
+</div>
+
+<div class="overlay" id="overlay" onclick="closePopup()"></div>
+
+<script>
+  var employees = [
+  { name: "Mr. Mihir Kapoor", area: "Ahmedabad", contactNo: "9999999999", experienceYear: 15 },
+  { name: "Ms. Kinjal Sharma", area: "Surat", contactNo: "9888888888", experienceYear: 10 },
+  { name: "Mr. Tejashree Verma", area: "Vadodara", contactNo: "9777777777", experienceYear: 8 },
+  { name: "Mr. Mayur Sharma", area: "Rajkot", contactNo: "9666666666", experienceYear: 17 },
+  { name: "Mr. Hardik Kewat", area: "Gandhinagar", contactNo: "9555555555", experienceYear: 3 }
+];
+
+function renderList() {
+
+  var tbody = document.querySelector('#employeeTable tbody');
+  tbody.innerHTML = '';
+
+  employees.forEach(function(employee, index) {
+    var row = tbody.insertRow();
+    var cellName = row.insertCell(0);
+    var cellArea = row.insertCell(1);
+    var cellContactNo = row.insertCell(2);
+    var cellExperienceYear = row.insertCell(3);
+
+    cellName.textContent = employee.name;
+    cellArea.textContent = employee.area;
+    cellContactNo.textContent = employee.contactNo;
+    cellExperienceYear.textContent = employee.experienceYear;
+
+    if (employee.experienceYear >= 15) {
+      row.classList.add('yellow-background');
+    } else if (employee.experienceYear < 5) {
+      row.classList.add('light-red-background');
+    }
+
+    row.addEventListener('click', function() {
+      showEmployeeDetails(employee, index);
+    });
+  });
+}
+renderList();
+
+function showEmployeeDetails(employee, index) {
+  var popupTitle = document.querySelector('#popupTitle');
+  var popupContent = document.querySelector('#popupContent');
+  var editButton = document.querySelector('#editButton');
+  var deleteButton = document.querySelector('#deleteButton');
+  var saveButton = document.querySelector('#saveButton');
+  var cancelButton = document.querySelector('#cancelButton');
+
+  popupTitle.textContent = "Employee Details";
+  popupContent.innerHTML = `
+    <div><strong>Name:</strong> ${employee.name}</div>
+    <div><strong>Area:</strong> ${employee.area}</div>
+    <div><strong>Contact No:</strong> ${employee.contactNo}</div>
+    <div><strong>Experience Year:</strong> ${employee.experienceYear}</div>
+  `;
+
+ 
+  document.getElementById('popup').style.display = 'block';
+  document.getElementById('overlay').style.display = 'block';
+
+
+  editButton.style.display = 'block';
+  deleteButton.style.display = 'block';
+  saveButton.style.display = 'none';
+  cancelButton.style.display = 'none';
+
+  
+  editButton.addEventListener('click', function() {
+    editEmployee(index);
+  });
+
+  deleteButton.addEventListener('click', function() {
+    deleteEmployee(index);
+  });
+}
+
+
+
+
+function editEmployee(index) {
+  var popupTitle = document.querySelector('#popupTitle');
+  var popupContent = document.querySelector('#popupContent');
+  var editButton = document.querySelector('#editButton');
+  var deleteButton = document.querySelector('#deleteButton');
+  var saveButton = document.querySelector('#saveButton');
+  var cancelButton = document.querySelector('#cancelButton');
+
+  popupTitle.textContent = "Employee Details";
+  popupContent.innerHTML = `
+    <div><strong>Name:</strong> <input id="editName" class="editable" value="${employees[index].name}"></div>
+    <div><strong>Area:</strong> <input id="editArea" class="editable" value="${employees[index].area}"></div>
+    <div><strong>Contact No:</strong> <input id="editContactNo" class="editable" value="${employees[index].contactNo}"></div>
+    <div><strong>Experience Year:</strong> <input id="editExperienceYear" class="editable" value="${employees[index].experienceYear}"></div>
+  `;
+
+
+  document.getElementById('popup').style.display = 'block';
+  document.getElementById('overlay').style.display = 'block';
+
+ 
+  editButton.style.display = 'none';
+  deleteButton.style.display = 'none';
+  saveButton.style.display = 'block';
+  cancelButton.style.display = 'block';
+
+ 
+  saveButton.addEventListener('click', function() {
+    saveEmployee(index);
+  });
+
+  cancelButton.addEventListener('click', function() {
+    cancelEdit(index);
+  });
+}
+function closePopup() {
+  document.getElementById('popup').style.display = 'none';
+  document.getElementById('overlay').style.display = 'none';
+}
+function saveEmployee(index) {
+  var newName = document.querySelector('#editName').value;
+  var newArea = document.querySelector('#editArea').value;
+  var newContactNo = document.querySelector('#editContactNo').value;
+  var newExperienceYear = document.querySelector('#editExperienceYear').value;
+
+ 
+  employees[index].name = newName;
+  employees[index].area = newArea;
+  employees[index].contactNo = newContactNo;
+  employees[index].experienceYear = newExperienceYear;
+
+  
+  renderList();
+
+
+  closePopup();
+}
+
+function cancelEdit(index) {
+  showEmployeeDetails(employees[index], index);
+}
+// Add this function after the previous code
+
+function deleteEmployee(index) {
+  var confirmation = confirm("Are you sure you want to delete this item?");
+
+  if (confirmation) {
+    // Delete the selected employee
+    employees.splice(index, 1);
+
+    // Re-render the list
+    renderList();
+
+    // Close the popup
+    closePopup();
+  }
+}
+
+
+</script>
+
+</body>
+</html>
